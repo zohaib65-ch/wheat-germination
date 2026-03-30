@@ -127,8 +127,7 @@ export default function WheatGerminationChart() {
             color: '#334155',
             maxRotation: isMobile ? 70 : 35,
             minRotation: isMobile ? 70 : 35,
-            autoSkip: isMobile,
-            maxTicksLimit: isMobile ? 10 : 15,
+            autoSkip: false,
           },
           grid: {
             color: 'rgba(148, 163, 184, 0.2)',
