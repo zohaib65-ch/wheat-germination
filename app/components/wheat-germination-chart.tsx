@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useMemo, useState } from 'react';
 import {
   BarElement,
   CategoryScale,
@@ -81,59 +82,79 @@ const data = {
   ],
 };
 
-const options = {
-  responsive: true,
-  maintainAspectRatio: false,
-  interaction: {
-    mode: 'index' as const,
-    intersect: false,
-  },
-  plugins: {
-    legend: {
-      position: 'bottom' as const,
-      labels: {
-        color: '#0f172a',
-        boxWidth: 14,
-        boxHeight: 14,
-        padding: 12,
-      },
-    },
-    tooltip: {
-      backgroundColor: '#0f172a',
-      titleColor: '#f8fafc',
-      bodyColor: '#e2e8f0',
-      padding: 10,
-    },
-  },
-  scales: {
-    x: {
-      ticks: {
-        color: '#334155',
-        maxRotation: 35,
-        minRotation: 35,
-      },
-      grid: {
-        color: 'rgba(148, 163, 184, 0.2)',
-      },
-    },
-    y: {
-      beginAtZero: true,
-      suggestedMax: 20,
-      ticks: {
-        color: '#334155',
-        stepSize: 2,
-      },
-      grid: {
-        color: 'rgba(148, 163, 184, 0.25)',
-      },
-    },
-  },
-};
-
 export default function WheatGerminationChart() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+    const update = () => setIsMobile(mediaQuery.matches);
+    update();
+    mediaQuery.addEventListener('change', update);
+    return () => mediaQuery.removeEventListener('change', update);
+  }, []);
+
+  const options = useMemo(
+    () => ({
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index' as const,
+        intersect: false,
+      },
+      plugins: {
+        legend: {
+          position: 'bottom' as const,
+          labels: {
+            color: '#0f172a',
+            boxWidth: isMobile ? 10 : 14,
+            boxHeight: isMobile ? 10 : 14,
+            padding: isMobile ? 8 : 12,
+            font: {
+              size: isMobile ? 10 : 12,
+            },
+          },
+        },
+        tooltip: {
+          backgroundColor: '#0f172a',
+          titleColor: '#f8fafc',
+          bodyColor: '#e2e8f0',
+          padding: 10,
+        },
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: '#334155',
+            maxRotation: isMobile ? 70 : 35,
+            minRotation: isMobile ? 70 : 35,
+            autoSkip: isMobile,
+            maxTicksLimit: isMobile ? 10 : 15,
+          },
+          grid: {
+            color: 'rgba(148, 163, 184, 0.2)',
+          },
+        },
+        y: {
+          beginAtZero: true,
+          suggestedMax: 20,
+          ticks: {
+            color: '#334155',
+            stepSize: 2,
+          },
+          grid: {
+            color: 'rgba(148, 163, 184, 0.25)',
+          },
+        },
+      },
+    }),
+    [isMobile]
+  );
+
   return (
-    <div className="h-[560px] w-full md:h-[640px]">
-      <Bar options={options} data={data} />
+    <div className="w-full overflow-x-auto">
+      <div className="h-[520px] min-w-[1100px] w-full md:h-[640px]">
+        <Bar options={options} data={data} />
+      </div>
     </div>
   );
 }
